@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chat Kita 💕</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body { background:#111b21; font-family:sans-serif; }
+
+.chat-container {
+  max-width:420px;
+  margin:auto;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:#0b141a;
+}
+
+.header {
+  background:#202c33;
+  color:white;
+  padding:10px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.profile {
+  width:40px; height:40px;
+  border-radius:50%;
+  object-fit:cover;
+}
+
+.status { font-size:12px; color:#aaa; }
+
+.chat-box {
+  flex:1;
+  padding:10px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+}
+
+.message {
+  max-width:75%;
+  padding:8px 10px;
+  border-radius:10px;
+  margin-bottom:8px;
+  font-size:14px;
+}
+
+.left { background:#202c33; color:white; align-self:flex-start; }
+.right { background:#005c4b; color:white; align-self:flex-end; }
+
+.meta {
+  font-size:10px;
+  text-align:right;
+  opacity:0.7;
+}
+
+.typing {
+  font-size:13px;
+  color:#aaa;
+  margin:5px;
+}
+
+.options {
+  padding:10px;
+  background:#202c33;
+  text-align:center;
+}
+
+input {
+  border-radius:20px;
+  padding:6px;
+  border:none;
+  width:65%;
+}
+
+.btn-option {
+  border-radius:20px;
+  margin:3px;
+}
+
+img.chat-img {
+  max-width:200px;
+  border-radius:10px;
+  margin-top:5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="chat-container">
+
+  <div class="header">
+    <img class="profile" src="assets/profile.jpg">
+    <div>
+      <div id="namaHeader">Yang Sayang Kamu ❤️</div>
+ <div class="status" id="status">online</div> 
+    </div>
+  </div>
+
+  <div class="chat-box" id="chat"></div>
+  <div class="options" id="options"></div>
+
+</div>
+
+<!-- AUDIO -->
+<audio id="notif" src="https://www.myinstants.com/media/sounds/whatsapp.mp3"></audio>
+<audio id="music" src="assets/music.mp3" loop></audio>
+<audio autoplay src="/assets/1.mp3"></audio>
+<script>
+const chat = document.getElementById("chat");
+const options = document.getElementById("options");
+const notif = document.getElementById("notif");
+const music = document.getElementById("music");
+
+let nama = "";
+
+/* UTIL */
+function getTime() {
+  let d = new Date();
+  return d.getHours().toString().padStart(2,'0') + ":" +
+         d.getMinutes().toString().padStart(2,'0');
+}
+
+function sendMessage(text, type="left") {
+  let msg = document.createElement("div");
+  msg.className = "message " + type;
+
+  msg.innerHTML = `
+    ${text}
+    <div class="meta">${getTime()} ${type==="right"?"✓✓":""}</div>
+  `;
+
+  chat.appendChild(msg);
+  chat.scrollTop = chat.scrollHeight;
+
+  notif.currentTime = 0;
+  notif.play();
+}
+
+function typing(callback) {
+  document.getElementById("status").innerText = "typing...";
+  
+  let t = document.createElement("div");
+  t.className = "typing";
+  t.innerText = "lagi ngetik...";
+  chat.appendChild(t);
+
+  chat.scrollTop = chat.scrollHeight;
+
+  setTimeout(() => {
+    t.remove();
+    document.getElementById("status").innerText = "online";
+    callback();
+  }, 1200);
+}
+
+function showOptions(arr) {
+  options.innerHTML = "";
+  arr.forEach(a => {
+    let btn = document.createElement("button");
+    btn.className = "btn btn-success btn-option";
+    btn.innerText = a.text;
+    btn.onclick = a.action;
+    options.appendChild(btn);
+  });
+}
+
+function showInput() {
+  options.innerHTML = `
+    <input type="text" id="namaInput" placeholder="Ketik nama kamu..."><br><br>
+    <button class="btn btn-success btn-option" onclick="saveData()">Kirim</button>
+  `;
+}
+
+/* START */
+function saveData() {
+  nama = document.getElementById("namaInput").value;
+  if (!nama.trim()) return;
+
+  // 🔊 play musik
+  music.volume = 0.4;
+  music.play();
+
+  sendMessage(nama, "right");
+//  / document.getElementById("namaHeader").innerText = nama;
+  options.innerHTML = "";
+
+  setTimeout(() => {
+    typing(() => {
+      sendMessage("Hai " + nama + " sayang ❤️");
+
+      // 📸 FOTO AWAL
+      let img = document.createElement("img");
+     // img.src = "assets/kamu.jpeg";
+    //  img.className = "chat-img";
+      chat.appendChild(img);
+
+      q1();
+    });
+  }, 800);
+}
+
+/* FLOW */
+function q1() {
+  typing(() => {
+    sendMessage("Kamu beneran sayang sama aku kan ?? 🥺");
+
+    showOptions([
+      { text:"Sayang Banget ❤️", action:()=>{sendMessage("Sayang Banget ❤️","right"); q2();}},
+      { text:"Biasa Saja 😳", action:()=>{sendMessage("Biasa Saja 😳","right"); q2();}}
+    ]);
+  });
+}
+
+function q2() {
+  typing(() => {
+    sendMessage("Kalau aku tiba-tiba hilang sehari, kamu bakal nyariin aku nggak? 🥺");
+
+    showOptions([
+      { text:"pasti lah sayang 😭", action:()=>{sendMessage("pasti lah sayang 😭","right"); q3();}},
+      { text:"nggak lah, ngapain 😅", action:()=>{sendMessage("nggak lah, ngapain 😅","right"); q3();}}
+    ]);
+  });
+}
+
+function q3() {
+  typing(() => {
+    sendMessage("Kalau aku nggak chat, kamu kangen aku nggak? 🥺");
+
+    // 📸 FOTO TENGAH
+    let img = document.createElement("img");
+   /*  img.src = "assets/kamu.jpeg";
+    img.className = "chat-img"; */
+    chat.appendChild(img);
+
+    showOptions([
+      { text:"Kangen Banget Pastinya😭", action:()=>{sendMessage("Kangen Banget Pastinya 😭","right"); q4();}},
+      { text:"Biasa 😅", action:()=>{sendMessage("Biasa 😅","right"); q4();}}
+    ]);
+  });
+}
+
+function q4() {
+  typing(() => {
+    sendMessage("janji seterusnya sama aku ? ❤️");
+
+    showOptions([
+      { text:"Janji ❤️", action:()=>{sendMessage("Janji ❤️","right"); q5();}},
+      { text:"Takut 😳", action:()=>{sendMessage("Takut 😳","right"); q5();}}
+    ]);
+  });
+}
+
+function q5() {
+  typing(() => {
+    sendMessage("Dengan Adanya Aku Kamu Bahagia Nggak ? ❤️");
+
+    showOptions([
+      { text:"Bahagia Banget 😭", action:()=>{sendMessage("Bahagia Banget 😭","right"); ending();}},
+      { text:"Tidak Sama Sekali 🙂", action:()=>{sendMessage("Tidak Sama Sekali 🙂","right"); ending();}}
+    ]);
+  });
+}
+
+/* ENDING */
+function ending() {
+  typing(() => {
+    sendMessage("Aku sayang banget sama sayang, elynya aku, cintanya aku 💕. Aku gak pernah tahu kalau seseorang bisa jadi seberarti ini dalam hidupku… sampai aku kenal kamu. Kamu itu bukan cuma orang yang aku sayang—kamu itu rumah buat semua rasa lelahku, tempat aku pulang saat dunia terasa terlalu berat. Bahkan hal-hal kecil dari kamu, cara kamu bicara, cara kamu peduli, itu semua selalu berhasil jadi alasan kenapa aku masih bisa tersenyum hari ini. Jujur, bahagiaku itu sederhana… selama masih ada kamu di sampingku, aku merasa dunia baik-baik saja. Kamu adalah tenang di tengah kacauku, kamu adalah alasan kenapa aku percaya kalau cinta itu benar-benar ada.Tapi di balik semua itu, ada satu hal yang selalu aku takutkan… kehilangan kamu. Karena kalau suatu hari kamu pergi, aku gak cuma kehilangan seseorang yang aku cinta—aku kehilangan bahagiaku sendiri.Jadi kalau aku terlihat terlalu menjaga kamu, terlalu takut kehilangan… itu bukan karena aku lemah. Tapi karena buat aku, kamu itu bukan sekadar pasangan—kamu adalah bagian paling penting dari hidupku yang gak tergantikan.");
+
+    setTimeout(() => {
+      sendMessage("Jangan pernah tinggalin aku ya... 🥺");
+
+      let img = document.createElement("img");
+      img.src = "assets/kamu.jpeg";
+      img.className = "chat-img";
+      chat.appendChild(img);
+
+      // 🔊 PLAY MUSIK SAAT FOTO MUNCUL
+      music.volume = 0;
+      music.play();
+
+      // 🔊 efek fade IN (biar halus & dramatis)
+      let fadeIn = setInterval(() => {
+        if (music.volume < 0.4) {
+          music.volume += 0.05;
+        } else {
+          clearInterval(fadeIn);
+        }
+      }, 200);
+
+      options.innerHTML = "";
+    }, 1500);
+  });
+}
+/* INIT */
+sendMessage("Hai sayangkuuu 😳");
+setTimeout(()=>{
+  sendMessage("Siapa nih Nama Sayangku ini ?? 😊");
+  showInput();
+},800);
+
+</script>
+
+</body>
+</html>
